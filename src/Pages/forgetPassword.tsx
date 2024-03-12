@@ -14,12 +14,23 @@ export const ForgotPassword = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
-  const handleChangePassword = useCallback(() => {
-    console.log({
-      password,
-    });
-    navigation("/dashboard");
-  }, [navigation, password]);
+  const handleChangePassword = useCallback(async () => {
+    try {
+      await fetch("http://localhost:5000/update-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      });
+      navigation("/login");
+    } catch (error) {
+      console.log(error);
+    }
+  }, [navigation, password, email]);
 
   return (
     <Box

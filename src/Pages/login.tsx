@@ -12,26 +12,50 @@ import { useNavigate } from "react-router-dom";
 export const Login = () => {
   const navigation = useNavigate();
   const [username, setUsername] = useState<string>("");
-  const [address, setAddress] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
 
-  const handleLogin = useCallback(() => {
-    console.log({
-      username,
-      password,
-    });
+  const handleLogin = useCallback(async () => {
+    try {
+      const { response }: any = await fetch("http://localhost:5000/log-in", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      });
+      localStorage.setItem("token", response?.token);
+    } catch (error) {
+      console.log(error);
+    }
     navigation("/dashboard");
-  }, [navigation, password, username]);
+  }, [navigation, password, email]);
 
-  const handleSignUp = useCallback(() => {
-    console.log({
-      username,
-      password,
-    });
+  const handleSignUp = useCallback(async () => {
+    try {
+      const { response }: any = await fetch("http://localhost:5000/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+          name: username,
+          phoneNo: phone,
+        }),
+      });
+      localStorage.setItem("token", response?.token);
+    } catch (error) {
+      console.log(error);
+    }
     navigation("/dashboard");
-  }, [navigation, password, username]);
+  }, [email, navigation, password, phone, username]);
 
   return (
     <Box
@@ -49,7 +73,7 @@ export const Login = () => {
         <Stack
           component={"form"}
           spacing={2}
-          onSubmit={!isSignUp ? handleSignUp : handleLogin}
+          onSubmit={isSignUp ? handleSignUp : handleLogin}
         >
           {isSignUp && (
             <>
@@ -61,11 +85,17 @@ export const Login = () => {
                 onChange={(e) => setUsername(e.target.value)}
               />
               <TextField
-                label="Address"
+                label="Phone Number"
                 variant="outlined"
                 fullWidth
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
+                type="number"
+                value={phone}
+                onChange={(e) => {
+                  const value = Math.max(0, parseInt(e?.target?.value))
+                    .toString()
+                    .slice(0, 10);
+                  setPhone(value);
+                }}
               />
             </>
           )}
