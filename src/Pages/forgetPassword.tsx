@@ -16,7 +16,7 @@ export const ForgotPassword = () => {
 
   const handleChangePassword = useCallback(async () => {
     try {
-      await fetch("http://localhost:5000/update-password", {
+      await fetch("http://localhost:8080/update-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -43,7 +43,7 @@ export const ForgotPassword = () => {
     >
       <Paper elevation={3} sx={{ padding: 4, width: 300 }}>
         <Typography variant="h5" mb={2} textAlign="center">
-          Forget
+          Forget Password
         </Typography>
         <Stack component={"form"} spacing={2} onSubmit={handleChangePassword}>
           <TextField

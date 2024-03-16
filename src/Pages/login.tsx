@@ -6,56 +6,77 @@ import {
   Typography,
   Box,
   Stack,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  SelectChangeEvent,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 export const Login = () => {
   const navigation = useNavigate();
+  const [userRole, setUserRole] = useState<string>("");
   const [username, setUsername] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
 
-  const handleLogin = useCallback(async () => {
-    try {
-      const { response }: any = await fetch("http://localhost:5000/log-in", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-          password: password,
-        }),
-      });
-      localStorage.setItem("token", response?.token);
-    } catch (error) {
-      console.log(error);
-    }
-    navigation("/dashboard");
-  }, [navigation, password, email]);
+  const handleLogin = useCallback(
+    async (e: any) => {
+      e.preventDefault();
+      try {
+        const { response }: any = await fetch("http://localhost:8080/log-in", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email,
+            password: password,
+          }),
+        });
+        localStorage.setItem("token", response?.token);
+        navigation("/dashboard");
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [navigation, password, email]
+  );
 
-  const handleSignUp = useCallback(async () => {
-    try {
-      const { response }: any = await fetch("http://localhost:5000/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-          password: password,
-          name: username,
-          phoneNo: phone,
-        }),
-      });
-      localStorage.setItem("token", response?.token);
-    } catch (error) {
-      console.log(error);
-    }
-    navigation("/dashboard");
-  }, [email, navigation, password, phone, username]);
+  const handleSignUp = useCallback(
+    async (e: any) => {
+      e.preventDefault();
+      try {
+        const { response }: any = await fetch(
+          "http://localhost:8080/register",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: email,
+              password: password,
+              name: username,
+              phoneNo: phone,
+            }),
+          }
+        );
+        localStorage.setItem("token", response?.token);
+        navigation("/dashboard");
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [email, navigation, password, phone, username]
+  );
+
+  const handleUserRole = useCallback((event: SelectChangeEvent) => {
+    setUserRole(event.target.value as string);
+  }, []);
 
   return (
     <Box
@@ -114,6 +135,22 @@ export const Login = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+          {!isSignUp && (
+            <FormControl fullWidth>
+              <InputLabel id="userRole">User Role</InputLabel>
+              <Select
+                labelId="userRole"
+                id="userRole"
+                value={userRole}
+                label="User Role"
+                onChange={handleUserRole}
+              >
+                <MenuItem value={"student"}>Student</MenuItem>
+                <MenuItem value={"buyer"}>Buyer</MenuItem>
+                <MenuItem value={"seller"}>Seller</MenuItem>
+              </Select>
+            </FormControl>
+          )}
           <Button variant="contained" color="primary" type="submit" fullWidth>
             {!isSignUp ? "Login" : "SignUp"}
           </Button>
